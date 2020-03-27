@@ -27,6 +27,7 @@ pipeline {
             steps {
                 withAWS(credentials: 'TerraformAWSCreds', region: 'ap-southeast-2') {
                 sh './get-instance-id.sh'
+                echo ${instance_ip}
                 }
                 sshagent(credentials : ['awskey']) {
                 sh 'ssh -o StrictHostKeyChecking=no ubuntu@${instance_ip} uptime'
