@@ -33,7 +33,7 @@ pipeline {
           myVar = readFile('myfile.txt').trim()
 
           // OPTION 2: set variable by grabbing output from script
-          myVar = sh(script: 'echo hotness', returnStdout: true).trim()
+          myVar = sh(script: './get-instance-id.sh', returnStdout: true).trim()
         }
         echo "${myVar}"
                 }
