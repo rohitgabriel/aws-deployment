@@ -29,7 +29,7 @@ pipeline {
                 sh './get-instance-id.sh'
                 }
                 sshagent(credentials : ['awskey']) {
-                sh 'ssh -o StrictHostKeyChecking=no ubuntu@$instance_ip uptime'
+                sh 'ssh -o StrictHostKeyChecking=no ubuntu@${instance_ip} uptime'
                 sh 'scp ./deploycode.sh ubuntu@13.54.226.2:/tmp/deploycode.sh'
                 sh 'ssh ubuntu@13.54.226.2 chmod 755 /tmp/deploycode.sh'
                 sh 'ssh ubuntu@13.54.226.2 /tmp/deploycode.sh'
