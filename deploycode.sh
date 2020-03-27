@@ -1,3 +1,3 @@
 #!/bin/bash
 cd /tmp
-git clone https://github.com/rohitgabriel/aws-deployment.git
+git clone https://github.com/rohitgabriel/weather-app.git
