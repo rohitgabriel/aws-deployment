@@ -25,14 +25,14 @@ pipeline {
         // }
         stage("Get Instance IP") {
             steps {
-                withAWS(credentials: 'TerraformAWSCreds', region: 'ap-southeast-2') {
-                sh '''
-                ./get-instance-id.sh
-                export instance_ip="${instance_ip}"
-                '''
+                INSTANCE_IP = withAWS(credentials: 'TerraformAWSCreds', region: 'ap-southeast-2') {
+                sh (
+                    script: './get-instance-id.sh'
+                    returnStdout: true
+                )
                 }
                 sshagent(credentials : ['awskey']) {
-                sh '''ssh -o StrictHostKeyChecking=no ubuntu@"${instance_ip}" uptime'''
+                sh '''ssh -o StrictHostKeyChecking=no ubuntu@"${INSTANCE_IP}" uptime'''
                 sh 'scp ./deploycode.sh ubuntu@13.54.226.2:/tmp/deploycode.sh'
                 sh 'ssh ubuntu@13.54.226.2 chmod 755 /tmp/deploycode.sh'
                 sh 'ssh ubuntu@13.54.226.2 /tmp/deploycode.sh'
