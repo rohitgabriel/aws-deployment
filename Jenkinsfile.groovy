@@ -7,18 +7,27 @@ pipeline {
         AWS_DEFAULT_REGION="ap-southeast-2"
     }
     stages {
-        stage('Checkout repo') {
+        // stage('Checkout repo') {
+        //     steps {
+        //         git branch: 'master',
+        //         credentialsId: 'mygitcredid',
+        //         url: 'https://github.com/rohitgabriel/aws-deployment.git'
+        //     }
+        // }
+        stage("ssh test") {
             steps {
-                git branch: 'master',
-                credentialsId: 'mygitcredid',
-                url: 'https://github.com/rohitgabriel/aws-deployment.git'
+                withCredentials(credentials: 'awskey', passwordVariable: 'password', usernameVariable: 'userName') {
+                sshScript remote: remote, script: 'get-instance-id.sh'
+                }
+                
             }
         }
         stage("Get Instance IP") {
             steps {
                 withAWS(credentials: 'TerraformAWSCreds', region: 'ap-southeast-2') {
                 sh './get-instance-id.sh'
-              }
+                }
+
             }
         }
         stage("Approval required") {
