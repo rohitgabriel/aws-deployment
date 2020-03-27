@@ -23,7 +23,7 @@ pipeline {
         //         }
         //     }
         // }
-        stage("Get Instance IP") {
+        stage("Get Instance IP and setup script") {
             steps {
                 withAWS(credentials: 'TerraformAWSCreds', region: 'ap-southeast-2') {
                 
@@ -33,24 +33,17 @@ pipeline {
                 echo "${instanceIP}"
                 }
                 sshagent(credentials : ['awskey']) {
-                sh "ssh -o StrictHostKeyChecking=no ubuntu@${instanceIP} uptime"
-                sh "scp ./deploycode.sh ubuntu@${instanceIP}:/tmp/deploycode.sh"
-                sh "ssh ubuntu@${instanceIP} chmod 755 /tmp/deploycode.sh"
-                sh "ssh ubuntu@${instanceIP} /tmp/deploycode.sh"
+                    sh "ssh -o StrictHostKeyChecking=no ubuntu@${instanceIP} uptime"
+                    sh "scp ./deploycode.sh ubuntu@${instanceIP}:/tmp/deploycode.sh"
+                    sh "ssh ubuntu@${instanceIP} chmod 755 /tmp/deploycode.sh"
                 }
             }
         }
-        stage("Approval required") {
-            input {
-            message "Deploy App or Abort?"
-            }
+        stage("Deploy WeatherApp") {
             steps {
-                echo 'This will deploy app code changes'
-            }
-        }
-        stage("clean up") {
-            steps {
-                echo 'clean up'
+                sshagent(credentials : ['awskey']) {
+                    sh "ssh ubuntu@${instanceIP} /tmp/deploycode.sh"
+                }
             }
         }
     }
