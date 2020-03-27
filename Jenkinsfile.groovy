@@ -14,12 +14,13 @@ pipeline {
         //         url: 'https://github.com/rohitgabriel/aws-deployment.git'
         //     }
         // }
-        stage("ssh test") {
-            steps {
-                withCredentials(credentials: 'awskey', passwordVariable: 'password', usernameVariable: 'userName') {
-                sshScript remote: remote, script: 'get-instance-id.sh'
+        stage ('Deploy') {
+            steps{
+                sshagent(credentials : ['awskey']) {
+                sh 'ssh -o StrictHostKeyChecking=no ubuntu@13.54.226.2 uptime'
+                sh 'ssh -v ubuntu@13.54.226.2'
+                sh 'scp ./get-instance-id.sh ubuntu@13.54.226.2:/tmp/target'
                 }
-                
             }
         }
         stage("Get Instance IP") {
