@@ -25,8 +25,8 @@ pipeline {
         // }
         stage("Get Instance IP") {
             steps {
-                INSTANCE_IP = withAWS(credentials: 'TerraformAWSCreds', region: 'ap-southeast-2') {
-                sh (
+                withAWS(credentials: 'TerraformAWSCreds', region: 'ap-southeast-2') {
+                INSTANCE_IP = sh (
                     script: './get-instance-id.sh',
                     returnStdout: true
                 )
