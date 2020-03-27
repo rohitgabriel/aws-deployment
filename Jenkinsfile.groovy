@@ -26,7 +26,10 @@ pipeline {
         stage("Get Instance IP") {
             steps {
                 withAWS(credentials: 'TerraformAWSCreds', region: 'ap-southeast-2') {
-                sh './get-instance-id.sh'
+                sh '''
+                ./get-instance-id.sh
+                export instance_ip="${instance_ip}"
+                '''
                 }
                 sshagent(credentials : ['awskey']) {
                 sh '''ssh -o StrictHostKeyChecking=no ubuntu@"${instance_ip}" uptime'''
