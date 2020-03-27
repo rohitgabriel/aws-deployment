@@ -26,20 +26,15 @@ pipeline {
         stage("Get Instance IP") {
             steps {
                 withAWS(credentials: 'TerraformAWSCreds', region: 'ap-southeast-2') {
-                sh './get-instance-id.sh > myfile.txt'
+                
                 script {
-          // OPTION 1: set variable by reading from file.
-          // FYI, trim removes leading and trailing whitespace from the string
-          myVar = readFile('myfile.txt').trim()
-
-          // OPTION 2: set variable by grabbing output from script
-          myVar = sh(script: './get-instance-id.sh', returnStdout: true).trim()
-        }
-        echo "${myVar}"
+                    instanceIP = sh(script: './get-instance-id.sh', returnStdout: true).trim()
+                }
+                echo "${instanceIP}"
                 }
                 sshagent(credentials : ['awskey']) {
-                sh '''ssh -o StrictHostKeyChecking=no ubuntu@\$instance_ip uptime'''
-                sh 'scp ./deploycode.sh ubuntu@13.54.226.2:/tmp/deploycode.sh'
+                sh '''ssh -o StrictHostKeyChecking=no ubuntu@"${instanceIP}" uptime'''
+                sh 'scp ./deploycode.sh ubuntu@${instanceIP}:/tmp/deploycode.sh'
                 sh 'ssh ubuntu@13.54.226.2 chmod 755 /tmp/deploycode.sh'
                 sh 'ssh ubuntu@13.54.226.2 /tmp/deploycode.sh'
                 }
